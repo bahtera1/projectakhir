@@ -1,47 +1,53 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class AuthService {
+class apiservice {
   static const String baseUrl =
-      'http://localhost:8000/api'; // Sesuaikan dengan URL API Anda
+      'http://127.0.0.1:8000/api'; // Sesuaikan URL sesuai dengan endpoint API Anda
 
-  Future<Map<String, dynamic>> login(String email, String password) async {
+  // Metode untuk menangani panggilan API login
+  static Future<Map<String, dynamic>?> login(
+      String email, String password) async {
+    final url = Uri.parse('$baseUrl/login');
     final response = await http.post(
-      Uri.parse('$baseUrl/login'),
-      body: {
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
         'email': email,
         'password': password,
-      },
+      }),
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      return jsonDecode(response.body);
     } else {
-      throw Exception('Failed to login');
+      throw Exception('Gagal melakukan login');
     }
   }
 
-  Future<Map<String, dynamic>> register({
-    required String name,
-    required String email,
-    required String password,
-    required String phone, // Ganti phoneNumber menjadi phone
-  }) async {
+  // Metode untuk menangani panggilan API registrasi
+  static Future<Map<String, dynamic>?> register(String username, String email,
+      String password, String confirmPassword) async {
+    final url = Uri.parse('$baseUrl/register');
     final response = await http.post(
-      Uri.parse('$baseUrl/register'),
-      body: {
-        'name': name,
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'name': username,
         'email': email,
         'password': password,
-        'password_confirmation': password,
-        'phone': phone, // Ganti key 'phone_number' menjadi 'phone'
-      },
+        'password_confirmation': confirmPassword,
+      }),
     );
 
     if (response.statusCode == 201) {
-      return json.decode(response.body);
+      return jsonDecode(response.body);
     } else {
-      throw Exception('Failed to register');
+      throw Exception('Gagal melakukan registrasi');
     }
   }
 }
